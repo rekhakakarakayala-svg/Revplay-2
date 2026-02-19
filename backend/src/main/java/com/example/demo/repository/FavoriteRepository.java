@@ -11,4 +11,7 @@ import java.util.Optional;
 @Repository
 public interface FavoriteRepository extends JpaRepository<Favorite, FavoriteId> {
     Optional<Favorite> findByUserAndSong(User user, Song song);
+
+    // NEW: Count total favorites for a user
+    long countByUser(User user);
 }

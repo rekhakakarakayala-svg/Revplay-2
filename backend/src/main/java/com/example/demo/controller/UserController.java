@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.UserProfileDTO;
+import com.example.demo.dto.UserStatsDTO;
 import com.example.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,10 +22,16 @@ public class UserController {
     // Endpoint: GET http://localhost:8080/api/users/me
     @GetMapping("/me")
     public ResponseEntity<UserProfileDTO> getCurrentUser(Authentication authentication) {
-        // The Authentication object automatically holds the email from the valid JWT!
         String email = authentication.getName();
-
         UserProfileDTO profile = userService.getUserProfile(email);
         return ResponseEntity.ok(profile);
+    }
+
+    // NEW Endpoint: GET http://localhost:8080/api/users/me/stats
+    @GetMapping("/me/stats")
+    public ResponseEntity<UserStatsDTO> getUserStats(Authentication authentication) {
+        String email = authentication.getName();
+        UserStatsDTO stats = userService.getUserStats(email);
+        return ResponseEntity.ok(stats);
     }
 }
