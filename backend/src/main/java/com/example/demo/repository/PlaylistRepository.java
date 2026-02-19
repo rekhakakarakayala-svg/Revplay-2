@@ -9,5 +9,8 @@ import java.util.List;
 @Repository
 public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     List<Playlist> findByUser(User user);
-    List<Playlist> findByPrivacy(String privacy); // To fetch all PUBLIC playlists
+    List<Playlist> findByPrivacy(String privacy);
+
+    // NEW: Count total playlists created by a user
+    long countByUser(User user);
 }
