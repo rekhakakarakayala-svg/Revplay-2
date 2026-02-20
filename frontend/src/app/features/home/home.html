@@ -1,0 +1,11 @@
+<div class="home-container">
+  <h1>Welcome to RevPlay!</h1>
+  
+  <h2 class="greeting">Hi, {{ userName }}!</h2>
+  
+  <p>You are logged in as: <strong>{{ userRole }}</strong></p>
+  
+  <button (click)="onLogout()" class="logout-btn">
+    Logout
+  </button>
+</div>
