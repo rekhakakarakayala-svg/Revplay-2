@@ -1,11 +1,44 @@
 <div class="home-container">
-  <h1>Welcome to RevPlay!</h1>
   
-  <h2 class="greeting">Hi, {{ userName }}!</h2>
-  
-  <p>You are logged in as: <strong>{{ userRole }}</strong></p>
-  
-  <button (click)="onLogout()" class="logout-btn">
-    Logout
-  </button>
+  <header class="dashboard-header">
+    <div>
+      <h1>Welcome to RevPlay!</h1>
+      <h2 class="greeting">Hi, {{ userName }}!</h2>
+    </div>
+    <div class="header-actions">
+      <button *ngIf="userRole === 'ARTIST'" routerLink="/upload" class="upload-btn">
+        + Upload Music
+      </button>
+      <button (click)="onLogout()" class="logout-btn">Logout</button>
+    </div>
+  </header>
+
+  <div class="music-feed">
+    <h3>Discover Tracks</h3>
+    
+    <div *ngIf="songs.length === 0" class="no-songs">
+      <p>No songs available yet. Be the first to upload!</p>
+    </div>
+
+    <div class="song-grid">
+      <div class="song-card" *ngFor="let song of songs" (click)="playSong(song)">
+        <div class="song-info">
+          <h4>{{ song.title }}</h4>
+          <p class="artist-name">{{ song.artistName || 'Unknown Artist' }}</p>
+          <span class="genre-badge">{{ song.genre }}</span>
+        </div>
+        <div class="play-overlay">▶</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="music-player-bar" *ngIf="currentSong">
+    <div class="now-playing-info">
+      <h4>{{ currentSong.title }}</h4>
+      <p>{{ currentSong.artistName || 'Unknown Artist' }}</p>
+    </div>
+    
+    <audio controls autoplay [src]="getAudioUrl(currentSong.audioFileUrl)"></audio>
+  </div>
+
 </div>
