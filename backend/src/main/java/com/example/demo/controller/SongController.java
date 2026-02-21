@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files; // NEW: Required to detect image types
 import java.util.List;
 
 @RestController
@@ -17,9 +18,8 @@ import java.util.List;
 public class SongController {
 
     private final SongService songService;
-    private final FileStorageService fileStorageService; // 👈 NEW: Added File Storage Service
+    private final FileStorageService fileStorageService;
 
-    // 👈 NEW: Updated constructor to include FileStorageService
     public SongController(SongService songService, FileStorageService fileStorageService) {
         this.songService = songService;
         this.fileStorageService = fileStorageService;
@@ -86,15 +86,30 @@ public class SongController {
         return ResponseEntity.ok("{\"message\": \"Song deleted successfully.\"}");
     }
 
-    // --- NEW: Audio Streaming Endpoint ---
-    // The "{fileName:.+}" syntax ensures it doesn't cut off file extensions like ".mp3"
     @GetMapping("/play/{fileName:.+}")
     public ResponseEntity<Resource> playAudio(@PathVariable String fileName) {
         Resource resource = fileStorageService.loadFileAsResource(fileName);
 
-        // This tells the browser "Hey, get ready to play an audio file!"
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("audio/mpeg"))
+                .body(resource);
+    }
+
+    // --- NEW: Image Serving Endpoint ---
+    @GetMapping("/image/{fileName:.+}")
+    public ResponseEntity<Resource> getImage(@PathVariable String fileName) {
+        Resource resource = fileStorageService.loadFileAsResource(fileName);
+
+        String contentType = "image/jpeg"; // Default fallback
+        try {
+            // This cleverly detects if it's a PNG or JPG automatically!
+            contentType = Files.probeContentType(resource.getFile().toPath());
+        } catch (Exception e) {
+            // Ignore error and use default
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
     }
 }

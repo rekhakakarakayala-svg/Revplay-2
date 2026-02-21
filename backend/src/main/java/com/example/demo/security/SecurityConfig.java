@@ -44,6 +44,9 @@ public class SecurityConfig {
                         // This allows the HTML <audio> tag to play music without a JWT token
                         .requestMatchers("/api/songs/play/**").permitAll()
 
+                        // NEW: Allow the image serving endpoint to be public so cover arts can load
+                        .requestMatchers("/api/songs/image/**").permitAll()
+
                         // 3. Allow access to physical upload folder if accessed directly
                         .requestMatchers("/uploads/**").permitAll()
 
