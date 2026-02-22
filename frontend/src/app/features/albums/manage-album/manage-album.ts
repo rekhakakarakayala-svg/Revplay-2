@@ -30,6 +30,7 @@ export class ManageAlbum implements OnInit {
   //  NEW: State for Edit Modal
   showEditModal: boolean = false;
   editAlbumData = { title: '', releaseYear: new Date().getFullYear(), description: '', coverImageUrl: '' };
+  selectedEditImage: File | null = null; //  NEW: Track updated file
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -91,11 +92,19 @@ export class ManageAlbum implements OnInit {
       description: this.album.description || '',
       coverImageUrl: this.album.coverImageUrl || ''
     };
+    this.selectedEditImage = null; // Reset file input
     this.showEditModal = true;
   }
 
   closeEditModal() {
     this.showEditModal = false;
+  }
+
+  //  NEW: Capture file update
+  onEditFileSelected(event: any) {
+    if (event.target.files.length > 0) {
+      this.selectedEditImage = event.target.files[0];
+    }
   }
 
   // NEW: Save Album Updates
@@ -105,7 +114,20 @@ export class ManageAlbum implements OnInit {
       return;
     }
 
-    this.albumService.updateAlbum(this.albumId, this.editAlbumData).subscribe({
+    //  PACK IT INTO FORMDATA
+    const formData = new FormData();
+    formData.append('title', this.editAlbumData.title);
+    if (this.editAlbumData.releaseYear) {
+      formData.append('releaseYear', this.editAlbumData.releaseYear.toString());
+    }
+    if (this.editAlbumData.description) {
+      formData.append('description', this.editAlbumData.description);
+    }
+    if (this.selectedEditImage) {
+      formData.append('coverImage', this.selectedEditImage);
+    }
+
+    this.albumService.updateAlbum(this.albumId, formData).subscribe({
       next: () => {
         this.loadAlbumData(); // Reload UI
         this.closeEditModal();

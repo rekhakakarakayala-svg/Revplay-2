@@ -22,6 +22,7 @@ export class MyAlbums implements OnInit {
   // Modal State
   showCreateModal: boolean = false;
   newAlbum = { title: '', releaseYear: new Date().getFullYear() };
+  selectedCoverImage: File | null = null; // NEW: Track selected file
 
   ngOnInit() {
     this.fetchMyAlbums();
@@ -43,11 +44,19 @@ export class MyAlbums implements OnInit {
 
   openCreateModal() {
     this.newAlbum = { title: '', releaseYear: new Date().getFullYear() };
+    this.selectedCoverImage = null; // Reset file input
     this.showCreateModal = true;
   }
 
   closeCreateModal() {
     this.showCreateModal = false;
+  }
+
+  // NEW: Capture file event
+  onFileSelected(event: any) {
+    if (event.target.files.length > 0) {
+      this.selectedCoverImage = event.target.files[0];
+    }
   }
 
   createAlbum() {
@@ -56,7 +65,17 @@ export class MyAlbums implements OnInit {
       return;
     }
 
-    this.albumService.createAlbum(this.newAlbum).subscribe({
+    // PACK IT INTO FORMDATA
+    const formData = new FormData();
+    formData.append('title', this.newAlbum.title);
+    if (this.newAlbum.releaseYear) {
+      formData.append('releaseYear', this.newAlbum.releaseYear.toString());
+    }
+    if (this.selectedCoverImage) {
+      formData.append('coverImage', this.selectedCoverImage);
+    }
+
+    this.albumService.createAlbum(formData).subscribe({
       next: (createdAlbum: any) => {
         this.albums.push(createdAlbum); 
         this.closeCreateModal();

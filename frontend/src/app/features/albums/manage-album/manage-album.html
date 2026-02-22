@@ -80,6 +80,11 @@
           <input type="number" [(ngModel)]="editAlbumData.releaseYear" class="form-input">
         </div>
 
+        <div class="form-group">
+          <label>Update Cover Art</label>
+          <input type="file" (change)="onEditFileSelected($event)" accept="image/*" class="form-input" style="padding: 7px;">
+        </div>
+
         <div class="modal-actions">
           <button class="cancel-btn" (click)="closeEditModal()">Cancel</button>
           <button class="save-btn" (click)="saveAlbumChanges()" [disabled]="!editAlbumData.title">Save Changes</button>

@@ -18,7 +18,7 @@ export class Album {
     return new HttpHeaders({ 'Authorization': `Bearer ${token}` });
   }
 
-  // 🌟 NEW: Get All Albums (Public)
+  // NEW: Get All Albums (Public)
   getAllAlbums(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl, { headers: this.getHeaders() });
   }
@@ -28,8 +28,8 @@ export class Album {
     return this.http.get<any>(`${this.apiUrl}/${albumId}`, { headers: this.getHeaders() });
   }
 
-  // --- Create Album (Artist Only) ---
-  createAlbum(albumData: any): Observable<any> {
+  // --- Create Album (Artist Only) -  UPDATED FOR FORMDATA ---
+  createAlbum(albumData: FormData): Observable<any> {
     return this.http.post<any>(this.apiUrl, albumData, { headers: this.getHeaders() });
   }
 
@@ -38,8 +38,8 @@ export class Album {
     return this.http.get<any[]>(`${this.apiUrl}/my`, { headers: this.getHeaders() });
   }
 
-  // --- Update Album (Artist Only) ---
-  updateAlbum(albumId: number, albumData: any): Observable<any> {
+  // --- Update Album (Artist Only) - UPDATED FOR FORMDATA ---
+  updateAlbum(albumId: number, albumData: FormData): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${albumId}`, albumData, { headers: this.getHeaders() });
   }
 
