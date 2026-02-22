@@ -18,6 +18,12 @@ public class AlbumController {
         this.albumService = albumService;
     }
 
+    // NEW: Get All Albums (Public Feed)
+    @GetMapping
+    public ResponseEntity<List<AlbumDTO>> getAllAlbums() {
+        return ResponseEntity.ok(albumService.getAllAlbums());
+    }
+
     // --- View a single album and its tracklist (Public) ---
     @GetMapping("/{albumId}")
     public ResponseEntity<AlbumDTO> getAlbumById(@PathVariable Long albumId) {

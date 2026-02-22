@@ -10,7 +10,10 @@ public class AlbumDTO {
     private String description;
     private LocalDate releaseDate;
     private String coverImageUrl;
-    private List<SongDTO> songs; // NEW: Added to hold the tracklist!
+    private List<SongDTO> songs;
+
+    //  NEW: Added to perfectly match the Angular frontend!
+    private Integer releaseYear;
 
     // --- Getters and Setters ---
     public Long getAlbumId() { return albumId; }
@@ -30,4 +33,8 @@ public class AlbumDTO {
 
     public List<SongDTO> getSongs() { return songs; }
     public void setSongs(List<SongDTO> songs) { this.songs = songs; }
+
+    //  NEW: Getters and Setters for Release Year
+    public Integer getReleaseYear() { return releaseYear; }
+    public void setReleaseYear(Integer releaseYear) { this.releaseYear = releaseYear; }
 }

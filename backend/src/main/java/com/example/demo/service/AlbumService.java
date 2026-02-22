@@ -12,6 +12,7 @@ import com.example.demo.repository.SongRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,13 +46,19 @@ public class AlbumService {
         Album album = new Album();
         album.setTitle(dto.getTitle());
         album.setDescription(dto.getDescription());
-        album.setReleaseDate(dto.getReleaseDate());
         album.setCoverImageUrl(dto.getCoverImageUrl());
         album.setArtist(artist);
 
+        // FIX: Convert the frontend's 4-digit releaseYear into a LocalDate (e.g., "2024-01-01")
+        if (dto.getReleaseYear() != null) {
+            album.setReleaseDate(LocalDate.of(dto.getReleaseYear(), 1, 1));
+        } else {
+            album.setReleaseDate(dto.getReleaseDate());
+        }
+
         albumRepository.save(album);
         dto.setAlbumId(album.getAlbumId());
-        return dto;
+        return mapToDTO(album); // Return cleanly mapped entity
     }
 
     // --- View My Albums ---
@@ -72,8 +79,14 @@ public class AlbumService {
 
         album.setTitle(dto.getTitle());
         album.setDescription(dto.getDescription());
-        album.setReleaseDate(dto.getReleaseDate());
         album.setCoverImageUrl(dto.getCoverImageUrl());
+
+        // FIX: Convert the frontend's year during updates too
+        if (dto.getReleaseYear() != null) {
+            album.setReleaseDate(LocalDate.of(dto.getReleaseYear(), 1, 1));
+        } else {
+            album.setReleaseDate(dto.getReleaseDate());
+        }
 
         albumRepository.save(album);
         return mapToDTO(album);
@@ -98,7 +111,6 @@ public class AlbumService {
         Song song = songRepository.findById(songId)
                 .orElseThrow(() -> new ResourceNotFoundException("Song not found"));
 
-        // Security Check: Make sure the artist owns both the album and the song
         if (!album.getArtist().getUser().getEmail().equals(email) ||
                 !song.getArtist().getUser().getEmail().equals(email)) {
             throw new RuntimeException("You can only modify your own albums and songs!");
@@ -117,18 +129,24 @@ public class AlbumService {
         Song song = songRepository.findById(songId)
                 .orElseThrow(() -> new ResourceNotFoundException("Song not found"));
 
-        // Security Check
         if (!album.getArtist().getUser().getEmail().equals(email)) {
             throw new RuntimeException("You can only modify your own albums!");
         }
 
-        // Unlink the song from the album
         if (song.getAlbum() != null && song.getAlbum().getAlbumId().equals(albumId)) {
             song.setAlbum(null);
             songRepository.save(song);
         }
 
         return "Song successfully removed from the album!";
+    }
+
+    // NEW: Get All Albums (For Public Home Feed)
+    public List<AlbumDTO> getAllAlbums() {
+        return albumRepository.findAll()
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     // --- Helper Mappers ---
@@ -139,6 +157,12 @@ public class AlbumService {
         dto.setDescription(album.getDescription());
         dto.setReleaseDate(album.getReleaseDate());
         dto.setCoverImageUrl(album.getCoverImageUrl());
+
+        // FIX: Extract the year from the LocalDate so Angular displays it perfectly!
+        if (album.getReleaseDate() != null) {
+            dto.setReleaseYear(album.getReleaseDate().getYear());
+        }
+
         return dto;
     }
 
