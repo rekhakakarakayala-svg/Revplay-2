@@ -1,0 +1,28 @@
+.global-player-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 90px;
+  background: #181818; /* Dark Spotify-like bar */
+  border-top: 1px solid #282828;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 9999; /* Ensure it floats above everything else */
+  box-sizing: border-box;
+}
+
+/* Left side: Album Art & Details */
+.now-playing-left { display: flex; align-items: center; gap: 15px; width: 30%; }
+.player-cover { width: 56px; height: 56px; border-radius: 5px; object-fit: cover; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+.song-info h4 { margin: 0 0 5px 0; font-size: 1rem; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.song-info p { margin: 0; font-size: 0.85rem; color: #b3b3b3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Center side: The Audio Controls */
+.player-center { width: 40%; display: flex; justify-content: center; }
+.player-center audio { width: 100%; max-width: 600px; height: 40px; outline: none; }
+
+/* Right side: Empty for now */
+.player-right { width: 30%; }

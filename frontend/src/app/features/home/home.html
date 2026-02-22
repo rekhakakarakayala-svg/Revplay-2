@@ -1,4 +1,4 @@
-<div class="home-container">
+<div class="home-container" style="padding-bottom: 100px;">
   
   <header class="dashboard-header">
     <div>
@@ -63,6 +63,7 @@
         </div>
       </div>
     </div>
+
     <h3>Discover Tracks</h3>
     
     <div class="search-filter-bar">
@@ -127,15 +128,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="music-player-bar" *ngIf="currentSong">
-    <div class="now-playing-info">
-      <h4>{{ currentSong.title }}</h4>
-      <p>{{ currentSong.artistName || 'Unknown Artist' }}</p>
-    </div>
-    
-    <audio controls autoplay [src]="getAudioUrl(currentSong.audioFileUrl)"></audio>
   </div>
 
   <div class="modal-overlay" *ngIf="showPlaylistModal">

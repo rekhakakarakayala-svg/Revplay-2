@@ -11,9 +11,6 @@ export class AuthService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  /**
-   * Login method: Expects a Map from Java with 'token' and 'role'
-   */
   login(credentials: any): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
@@ -27,9 +24,6 @@ export class AuthService {
     );
   }
 
-  /**
-   * Register method: Handles the 'text' response from Java
-   */
   register(userData: any): Observable<string> {
     return this.http.post(`${this.apiUrl}/register`, userData, { responseType: 'text' });
   }
@@ -52,8 +46,12 @@ export class AuthService {
     return localStorage.getItem('user_role');
   }
 
+  // FIX: Added this method so AudioService and Home can safely check who is logged in!
+  getUserName(): string | null {
+    return localStorage.getItem('userName'); 
+  }
+
   isLoggedIn(): boolean {
-    // Returns true if token exists, false otherwise
     return !!this.getToken();
   }
 
