@@ -14,6 +14,10 @@
          My Uploads
       </button>
 
+      <button *ngIf="userRole === 'ARTIST'" routerLink="/my-albums" class="upload-btn">
+         My Albums
+      </button>
+
       <button *ngIf="userRole === 'ARTIST'" routerLink="/analytics" class="upload-btn">
          Analytics
       </button>
@@ -62,6 +66,28 @@
             <div class="song-stats">
               <span class="play-count">Played: {{ history.playedAt | date:'shortTime' }}</span>
             </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="albums-section" *ngIf="albums.length > 0" style="margin-bottom: 50px;">
+      <h3>Trending Albums</h3>
+      
+      <div class="song-grid" style="display: flex; overflow-x: auto; padding-bottom: 15px; gap: 20px;">
+        <div class="song-card" *ngFor="let album of albums" (click)="goToAlbum(album.albumId)" style="min-width: 200px;">
+          
+          <div class="album-art">
+            <img *ngIf="album.coverImageUrl" [src]="getCoverImageUrl(album.coverImageUrl)" alt="Album Art">
+            <div *ngIf="!album.coverImageUrl" class="placeholder-art" style="font-size: 3rem; background: #282828; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;">💿</div>
+          </div>
+
+          <div class="song-info">
+            <div class="song-title-row">
+              <h4>{{ album.title }}</h4>
+            </div>
+            <p class="artist-name">Released: {{ album.releaseYear || 'Unknown' }}</p>
           </div>
 
         </div>

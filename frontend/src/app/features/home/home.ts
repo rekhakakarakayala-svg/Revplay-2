@@ -7,6 +7,7 @@ import { Song } from '../../core/services/song/song';
 import { Playlist } from '../../core/services/playlist/playlist'; 
 import { History } from '../../core/services/history/history'; 
 import { AudioService } from '../../core/services/audio/audio'; 
+import { Album } from '../../core/services/album/album'; // NEW: Import Album Service
 import { environment } from '../../../environments/environment'; 
 
 @Component({
@@ -22,11 +23,13 @@ export class Home implements OnInit {
   private playlistService = inject(Playlist); 
   private historyService = inject(History); 
   private audioService = inject(AudioService); 
+  private albumService = inject(Album); // NEW: Inject Album Service
   private router = inject(Router);
 
   userName: string = '';
   userRole: string = '';
   songs: any[] = []; 
+  albums: any[] = []; // NEW: Array to hold Trending Albums
   
   searchQuery: string = '';
   selectedGenre: string = '';
@@ -47,6 +50,7 @@ export class Home implements OnInit {
     this.fetchSongs();
     this.fetchLikedSongs();
     this.fetchRecentHistory(); 
+    this.fetchAlbums(); // NEW: Fetch albums on load
 
     this.audioService.restoreUserSong();
   }
@@ -55,6 +59,14 @@ export class Home implements OnInit {
     this.songService.getAllSongs().subscribe({
       next: (data: any[]) => this.songs = data,
       error: (err: any) => console.error('Failed to load songs:', err)
+    });
+  }
+
+  // NEW: Fetch Trending Albums
+  fetchAlbums() {
+    this.albumService.getAllAlbums().subscribe({
+      next: (data: any[]) => this.albums = data,
+      error: (err: any) => console.error('Failed to load albums:', err)
     });
   }
 
@@ -106,16 +118,18 @@ export class Home implements OnInit {
     this.fetchSongs();
   }
 
+  // NEW: Navigate to the public album page
+  goToAlbum(albumId: number) {
+    this.router.navigate(['/album', albumId]);
+  }
+
   playSong(song: any) {
-    // NEW: Determine which list they clicked from to set the correct queue
     let currentQueue = this.songs;
     
-    // If the song isn't in the main list, they must have clicked 'Recently Played'
     if (!this.songs.some(s => s.songId === song.songId)) {
       currentQueue = this.recentHistory;
     }
 
-    // Map properties so the player gets a consistent object structure
     const songToPlay = {
       songId: song.songId,
       title: song.title || song.songTitle,
@@ -124,7 +138,6 @@ export class Home implements OnInit {
       coverImageUrl: song.coverImageUrl || null 
     };
 
-    // Replace the clicked song object in the queue with this mapped one so findIndex matches
     const mappedQueue = currentQueue.map(s => ({
       songId: s.songId,
       title: s.title || s.songTitle,
@@ -133,7 +146,6 @@ export class Home implements OnInit {
       coverImageUrl: s.coverImageUrl || null 
     }));
 
-    // Send to Global Player!
     this.audioService.playSong(songToPlay, mappedQueue);
 
     if (song.playCount !== undefined) {
