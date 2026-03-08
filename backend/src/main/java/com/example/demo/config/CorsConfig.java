@@ -16,8 +16,8 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Apply to all endpoints
                         .allowedOrigins(
-                                "http://localhost:4200",     // Local Angular dev
-                                "http://13.53.127.36:4200" // EC2 public Angular frontend
+                                "http://localhost:4200",     // Angular dev on local
+                                "http://13.53.127.36:4200"  // Angular frontend on EC2
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")          // Allow all headers
