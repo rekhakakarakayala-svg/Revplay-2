@@ -16,13 +16,14 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Apply to all endpoints
                         .allowedOrigins(
-                                "http://localhost:4200",     // Angular dev on local
-                                "http://13.53.127.36:4200"  // Angular frontend on EC2
+                                "http://localhost:4200",      // Local Angular dev server
+                                "http://13.53.127.36:4200",  // Angular dev on EC2
+                                "http://13.53.127.36"        // For production Angular build served by Spring
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")          // Allow all headers
-                        .allowCredentials(true)       // Needed for cookies or auth headers
-                        .maxAge(3600);                // Cache preflight response for 1 hour
+                        .allowedHeaders("*")
+                        .allowCredentials(true)
+                        .maxAge(3600); // Cache preflight requests for 1 hour
             }
         };
     }
