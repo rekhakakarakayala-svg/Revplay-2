@@ -10,26 +10,19 @@ public class CorsConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
-
         return new WebMvcConfigurer() {
 
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-
-                registry.addMapping("/**")
+                registry.addMapping("/**") // Apply to all endpoints
                         .allowedOrigins(
-                                "http://localhost:4200",
-                                "http://13.53.127.36"
+                                "http://localhost:4200",     // Local Angular dev
+                                "http://13.53.127.36:4200" // EC2 public Angular frontend
                         )
-                        .allowedMethods(
-                                "GET",
-                                "POST",
-                                "PUT",
-                                "DELETE",
-                                "OPTIONS"
-                        )
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")          // Allow all headers
+                        .allowCredentials(true)       // Needed for cookies or auth headers
+                        .maxAge(3600);                // Cache preflight response for 1 hour
             }
         };
     }
