@@ -10,14 +10,26 @@ public class CorsConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
+
         return new WebMvcConfigurer() {
+
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // 👈 Applies to ALL endpoints (/api/auth, /api/songs, etc.)
-                        .allowedOrigins("http://localhost:4200") // 👈 Your Angular app URL
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 👈 Allowed request types
-                        .allowedHeaders("*") // 👈 Allows all headers (Crucial for your JWT 'Authorization' header!)
-                        .allowCredentials(true); // 👈 Allows credentials/tokens to be sent
+
+                registry.addMapping("/**")
+                        .allowedOrigins(
+                                "http://localhost:4200",
+                                "http://13.53.127.36"
+                        )
+                        .allowedMethods(
+                                "GET",
+                                "POST",
+                                "PUT",
+                                "DELETE",
+                                "OPTIONS"
+                        )
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }
