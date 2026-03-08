@@ -31,30 +31,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                    // Allow everyone to Login and Register
-                    .requestMatchers("/api/auth/**").permitAll()
-                    
-                    // Allow Swagger UI and API Docs
-                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                    
-                    // Public endpoints (audio streaming & images)
-                    .requestMatchers("/api/songs/play/**").permitAll()
-                    .requestMatchers("/api/songs/image/**").permitAll()
-                    
-                    // Allow direct access to uploads folder
-                    .requestMatchers("/uploads/**").permitAll()
-                    
-                    // Artist-specific routes
-                    .requestMatchers("/api/artist/**").hasRole("ARTIST")
-                    
-                    // Everything else requires authentication
-                    .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                // Enable CORS using the bean
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeHttpRequests(auth -> auth
+                        // Root path public
+                        .requestMatchers("/").permitAll()
+                        
+                        // Auth endpoints public
+                        .requestMatchers("/api/auth/**").permitAll()
+                        
+                        // Swagger docs (optional)
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        
+                        // Public audio/image endpoints
+                        .requestMatchers("/api/songs/play/**").permitAll()
+                        .requestMatchers("/api/songs/image/**").permitAll()
+                        
+                        // Allow direct uploads access
+                        .requestMatchers("/uploads/**").permitAll()
+                        
+                        // Artist-specific routes
+                        .requestMatchers("/api/artist/**").hasRole("ARTIST")
+                        
+                        // Everything else requires authentication
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -73,14 +79,20 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Allow both local dev and EC2 frontend
+        // Allowed origins (Angular frontend)
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:4200", 
+                "http://localhost:4200",
                 "http://13.53.127.36:4200"
         ));
+
+        // Allowed HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Allowed headers
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true); // important if JWT or cookies are used
+
+        // Allow credentials (cookies, authorization headers)
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
