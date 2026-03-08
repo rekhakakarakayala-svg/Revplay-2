@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,7 +18,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -31,36 +29,32 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Enable CORS using the bean
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authorizeHttpRequests(auth -> auth
-                        // Root path public
-                        .requestMatchers("/").permitAll()
-                        
-                        // Auth endpoints public
-                        .requestMatchers("/api/auth/**").permitAll()
-                        
-                        // Swagger docs (optional)
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        
-                        // Public audio/image endpoints
-                        .requestMatchers("/api/songs/play/**").permitAll()
-                        .requestMatchers("/api/songs/image/**").permitAll()
-                        
-                        // Allow direct uploads access
-                        .requestMatchers("/uploads/**").permitAll()
-                        
-                        // Artist-specific routes
-                        .requestMatchers("/api/artist/**").hasRole("ARTIST")
-                        
-                        // Everything else requires authentication
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authorizeHttpRequests(auth -> auth
+                // Allow public access for auth endpoints
+                .requestMatchers("/api/auth/**").permitAll()
+                
+                // Allow Swagger UI if needed
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                
+                // Allow public access to song play & images
+                .requestMatchers("/api/songs/play/**").permitAll()
+                .requestMatchers("/api/songs/image/**").permitAll()
+                
+                // Allow access to uploaded files
+                .requestMatchers("/uploads/**").permitAll()
+                
+                // Only ARTIST role can access artist endpoints
+                .requestMatchers("/api/artist/**").hasRole("ARTIST")
+                
+                // All other endpoints require authentication
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -78,20 +72,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // Allowed origins (Angular frontend)
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:4200",
-                "http://13.53.127.36:4200"
+            "http://localhost:4200",
+            "http://13.53.127.36:4200",
+            "http://13.53.127.36"
         ));
-
-        // Allowed HTTP methods
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // Allowed headers
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-
-        // Allow credentials (cookies, authorization headers)
+        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
